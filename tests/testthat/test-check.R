@@ -1,42 +1,37 @@
+testthat::test_that("What package does the input object belong?", {
+  withr::local_package("stars")
+  withr::local_package("terra")
+  withr::local_options(list(sf_use_s2 = FALSE))
+  bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
+  bcsd_stars <- stars::read_stars(bcsd_path)
 
-testthat::test_that("What package does the input object belong?",
-  {
-    withr::local_package("stars")
-    withr::local_package("terra")
-    withr::local_options(list(sf_use_s2 = FALSE))
-    bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
-    bcsd_stars <- stars::read_stars(bcsd_path)
+  packbound_stars <- dep_check(bcsd_stars)
+  sprast_bcsd <- terra::rast(bcsd_path)
+  packbound_terra <- dep_check(sprast_bcsd)
 
-    packbound_stars <- dep_check(bcsd_stars)
-    sprast_bcsd <- terra::rast(bcsd_path)
-    packbound_terra <- dep_check(sprast_bcsd)
-
-    testthat::expect_equal(packbound_stars, "sf")
-    testthat::expect_equal(packbound_terra, "terra")
-  }
-)
+  testthat::expect_equal(packbound_stars, "sf")
+  testthat::expect_equal(packbound_terra, "terra")
+})
 
 
-testthat::test_that("What package does the input object belong?",
-  {
-    withr::local_package("stars")
-    withr::local_package("terra")
-    withr::local_options(list(sf_use_s2 = FALSE))
-    bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
-    bcsd_stars <- stars::read_stars(bcsd_path)
+testthat::test_that("What package does the input object belong?", {
+  withr::local_package("stars")
+  withr::local_package("terra")
+  withr::local_options(list(sf_use_s2 = FALSE))
+  bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
+  bcsd_stars <- stars::read_stars(bcsd_path)
 
-    nc <- system.file(package = "sf", "shape/nc.shp")
-    nc <- sf::read_sf(nc)
+  nc <- system.file(package = "sf", "shape/nc.shp")
+  nc <- sf::read_sf(nc)
 
-    datatype_stars <- datamod(bcsd_stars)
-    datatype_sf <- datamod(nc)
+  datatype_stars <- datamod(bcsd_stars)
+  datatype_sf <- datamod(nc)
 
-    testthat::expect_equal(datatype_stars, "raster")
-    testthat::expect_equal(datatype_sf, "vector")
+  testthat::expect_equal(datatype_stars, "raster")
+  testthat::expect_equal(datatype_sf, "vector")
 
-    testthat::expect_error(datamod(list(1, 2)))
-  }
-)
+  testthat::expect_error(datamod(list(1, 2)))
+})
 
 testthat::test_that("CRS is transformed when it is not standard", {
   withr::local_package("sf")
@@ -72,7 +67,6 @@ testthat::test_that("CRS is transformed when it is not standard", {
   terra::crs(ncnatr) <- NULL
   # error case
   testthat::expect_error(reproject_std(ncnatr, "EPSG:4326"))
-
 })
 
 
@@ -158,7 +152,6 @@ testthat::test_that("crs_check is working as expected", {
   nctna <- nct
   terra::crs(nctna) <- ""
   testthat::expect_error(crs_check(nctna))
-
 })
 
 
@@ -177,7 +170,6 @@ testthat::test_that("nc data is within the mainland US", {
   # error cases
   testthat::expect_error(is_within_ref(list(1), mainland_box))
   testthat::expect_error(is_within_ref(nc, list(1)))
-
 })
 
 testthat::test_that("check_subject performs necessary conversions", {
@@ -192,13 +184,15 @@ testthat::test_that("check_subject performs necessary conversions", {
 
   checked_char <-
     check_subject(
-      input_char, extent = NULL, subject_id = "FIPS"
+      input_char,
+      extent = NULL, subject_id = "FIPS"
     )
   testthat::expect_equal(dep_check(checked_char), "terra")
 
   checked_ext <-
     check_subject(
-      input_char, extent = c(-80, -77, 35, 36), subject_id = "FIPS"
+      input_char,
+      extent = c(-80, -77, 35, 36), subject_id = "FIPS"
     )
   testthat::expect_equal(dep_check(checked_ext), "terra")
 })

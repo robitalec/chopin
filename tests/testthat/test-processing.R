@@ -1,4 +1,3 @@
-
 testthat::test_that("Vector inputs are clipped by clip_vec_ext", {
   withr::local_package("sf")
   withr::local_package("terra")
@@ -6,7 +5,8 @@ testthat::test_that("Vector inputs are clipped by clip_vec_ext", {
 
   ncpath <- system.file("extdata/nc_hierarchy.gpkg", package = "chopin")
   nccnty <- terra::vect(
-    ncpath, layer = "county",
+    ncpath,
+    layer = "county",
     query = "SELECT * FROM county WHERE GEOID IN (37063, 37183)"
   )
   nctrct <- terra::vect(ncpath, layer = "tracts")
@@ -62,7 +62,6 @@ testthat::test_that("Vector inputs are clipped by clip_vec_ext", {
       pnts = NULL, radius = 3e4L, target_input = nctrct
     )
   )
-
 })
 
 
@@ -131,7 +130,8 @@ testthat::test_that("extract_at runs well", {
       )
   )
 
-  withr::with_envvar(c("CHOPIN_FORCE_CROP" = "TRUE"),
+  withr::with_envvar(
+    c("CHOPIN_FORCE_CROP" = "TRUE"),
     testthat::expect_no_error(
       extract_at(
         nccntytr,
@@ -159,7 +159,8 @@ testthat::test_that("extract_at runs well", {
       radius = 1e4L
     )
   )
-  withr::with_envvar(c("CHOPIN_FORCE_CROP" = "TRUE"),
+  withr::with_envvar(
+    c("CHOPIN_FORCE_CROP" = "TRUE"),
     testthat::expect_no_error(
       extract_at(ncp,
         ncelev,
@@ -191,7 +192,8 @@ testthat::test_that("extract_at runs well", {
         radius = 1e4L
       )
   )
-  withr::with_envvar(c("CHOPIN_FORCE_CROP" = "TRUE"),
+  withr::with_envvar(
+    c("CHOPIN_FORCE_CROP" = "TRUE"),
     testthat::expect_no_error(
       extract_at_buffer(
         ncp,
@@ -222,34 +224,39 @@ testthat::test_that("extract_at runs well", {
   # errors
   testthat::expect_error(
     extract_at(nccntytr,
-               ncelev,
-               "FIPS",
-               mode = "whatnot")
+      ncelev,
+      "FIPS",
+      mode = "whatnot"
+    )
   )
   testthat::expect_error(
     extract_at_buffer(nccntytr,
-               list(1),
-               "FIPS",
-               radius = 1e4)
+      list(1),
+      "FIPS",
+      radius = 1e4
+    )
   )
   testthat::expect_error(
     extract_at(nccntytr,
-               ncelev,
-               "GEOID",
-               mode = "polygon")
+      ncelev,
+      "GEOID",
+      mode = "polygon"
+    )
   )
   testthat::expect_error(
     extract_at(nccntytr,
-               ncelev,
-               1,
-               mode = "buffer",
-               radius = 1e4L)
+      ncelev,
+      1,
+      mode = "buffer",
+      radius = 1e4L
+    )
   )
   testthat::expect_error(
     extract_at_buffer(as.list(ncp),
-                      ncelev,
-                      id = "GEOID",
-                      radius = 1e4L)
+      ncelev,
+      id = "GEOID",
+      radius = 1e4L
+    )
   )
   testthat::expect_error(
     extract_at_buffer(
@@ -325,7 +332,6 @@ testthat::test_that("extract_at runs well", {
       id = 2
     )
   )
-
 })
 
 
@@ -351,15 +357,15 @@ testthat::test_that("Character input works", {
     extract_at(ncpfile, ncelev, "pid", mode = "buffer", radius = 1e4L)
   )
   testthat::expect_no_error(
-    extract_at(ncpfile, ncelev, "pid", mode = "buffer", radius = 1e4L,
-               kernel = "epanechnikov", func = stats::weighted.mean,
-               bandwidth = 1.25e4L)
+    extract_at(ncpfile, ncelev, "pid",
+      mode = "buffer", radius = 1e4L,
+      kernel = "epanechnikov", func = stats::weighted.mean,
+      bandwidth = 1.25e4L
+    )
   )
   testthat::expect_no_error(
     extract_at(nccnty, ncelev, "FIPS", mode = "polygon")
   )
-
-
 })
 
 testthat::test_that("summarize_aw works as expected.", {

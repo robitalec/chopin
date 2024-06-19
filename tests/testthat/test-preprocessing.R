@@ -1,32 +1,29 @@
+testthat::test_that("Format is well converted", {
+  withr::local_package("stars")
+  withr::local_package("terra")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
-testthat::test_that("Format is well converted",
-  {
-    withr::local_package("stars")
-    withr::local_package("terra")
-    withr::local_options(list(sf_use_s2 = FALSE))
+  # starts from sf/stars
+  bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
+  bcsd_stars <- stars::read_stars(bcsd_path)
+  nc <- system.file(package = "sf", "shape/nc.shp")
+  nc <- sf::read_sf(nc)
 
-    # starts from sf/stars
-    bcsd_path <- system.file(package = "stars", "nc/bcsd_obs_1999.nc")
-    bcsd_stars <- stars::read_stars(bcsd_path)
-    nc <- system.file(package = "sf", "shape/nc.shp")
-    nc <- sf::read_sf(nc)
+  stars_bcsd_tr <- dep_switch(bcsd_stars)
+  sf_nc_tr <- dep_switch(nc)
 
-    stars_bcsd_tr <- dep_switch(bcsd_stars)
-    sf_nc_tr <- dep_switch(nc)
+  testthat::expect_equal(dep_check(stars_bcsd_tr), "terra")
+  testthat::expect_equal(dep_check(sf_nc_tr), "terra")
 
-    testthat::expect_equal(dep_check(stars_bcsd_tr), "terra")
-    testthat::expect_equal(dep_check(sf_nc_tr), "terra")
+  stars_bcsd_trb <- dep_switch(stars_bcsd_tr)
+  sf_nc_trb <- dep_switch(sf_nc_tr)
 
-    stars_bcsd_trb <- dep_switch(stars_bcsd_tr)
-    sf_nc_trb <- dep_switch(sf_nc_tr)
+  testthat::expect_equal(dep_check(stars_bcsd_trb), "sf")
+  testthat::expect_equal(dep_check(sf_nc_trb), "sf")
 
-    testthat::expect_equal(dep_check(stars_bcsd_trb), "sf")
-    testthat::expect_equal(dep_check(sf_nc_trb), "sf")
-
-    testthat::expect_error(dep_check(list(1, 2)))
-    testthat::expect_error(dep_check(matrix(c(1, 2), nrow = 2, byrow = TRUE)))
-  }
-)
+  testthat::expect_error(dep_check(list(1, 2)))
+  testthat::expect_error(dep_check(matrix(c(1, 2), nrow = 2, byrow = TRUE)))
+})
 
 
 
@@ -59,5 +56,4 @@ testthat::test_that("Clip extent is set properly", {
 
   testthat::expect_equal(nc_ext_sf_1, proper_xmin)
   testthat::expect_equal(nc_ext_terra_1, proper_xmin)
-
 })

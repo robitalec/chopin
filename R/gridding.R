@@ -47,7 +47,8 @@
 #'     nc,
 #'     mode = "grid",
 #'     nx = 12L, ny = 8L,
-#'     padding = 10000)
+#'     padding = 10000
+#'   )
 #' par(mfcol = c(1, 2))
 #' plot(nc_comp_region$original)
 #' plot(nc_comp_region$padded)
@@ -58,17 +59,16 @@
 #' @importFrom terra buffer
 #' @export
 par_make_gridset <-
-  function(
-      input,
-      mode = c("grid", "grid_advanced", "grid_quantile"),
-      nx = 10L,
-      ny = 10L,
-      grid_min_features = 30L,
-      padding = NULL,
-      unit = NULL,
-      quantiles = NULL,
-      merge_max = NULL,
-      ...) {
+  function(input,
+           mode = c("grid", "grid_advanced", "grid_quantile"),
+           nx = 10L,
+           ny = 10L,
+           grid_min_features = 30L,
+           padding = NULL,
+           unit = NULL,
+           quantiles = NULL,
+           merge_max = NULL,
+           ...) {
     mode <- match.arg(mode)
 
     if (!all(
@@ -92,12 +92,12 @@ par_make_gridset <-
       switch(mode,
         grid = par_make_grid(points_in = input, ncutsx = nx, ncutsy = ny),
         grid_advanced =
-        par_merge_grid(
-          points_in = input,
-          par_make_grid(input, nx, ny),
-          grid_min_features = grid_min_features,
-          merge_max = merge_max
-        ),
+          par_merge_grid(
+            points_in = input,
+            par_make_grid(input, nx, ny),
+            grid_min_features = grid_min_features,
+            merge_max = merge_max
+          ),
         grid_quantile = par_cut_coords(
           x = input,
           y = NULL,
@@ -119,7 +119,7 @@ par_make_gridset <-
             )
           }
         )
-      
+
       # grid_reg <- sf::st_set_crs(grid_reg, sf::st_crs(input))
       grid_reg_conv <- dep_switch(grid_reg)
     } else {
@@ -147,10 +147,11 @@ par_make_gridset <-
       grid_reg_pad <- dep_switch(grid_reg_pad)
     }
     grid_results <-
-      list(original = grid_reg,
-           padded = grid_reg_pad)
+      list(
+        original = grid_reg,
+        padded = grid_reg_pad
+      )
     return(grid_results)
-
   }
 
 
@@ -186,10 +187,9 @@ par_make_gridset <-
 #' @export
 par_group_grid <-
   function(
-    points_in = NULL,
-    ngroups,
-    padding
-  ) {
+      points_in = NULL,
+      ngroups,
+      padding) {
     if (missing(ngroups)) {
       stop("ngroups should be specified.\n")
     }
@@ -231,8 +231,10 @@ par_group_grid <-
       grid_reg_pad <- dep_switch(grid_reg_pad)
     }
     grid_results <-
-      list(original = pgroups,
-           padded = grid_reg_pad)
+      list(
+        original = pgroups,
+        padded = grid_reg_pad
+      )
     return(grid_results)
   }
 
@@ -273,10 +275,9 @@ par_group_grid <-
 #' @export
 par_make_grid <-
   function(
-    points_in = NULL,
-    ncutsx = NULL,
-    ncutsy = NULL
-  ) {
+      points_in = NULL,
+      ncutsx = NULL,
+      ncutsy = NULL) {
     if (is.character(points_in)) {
       points_in <- try(terra::vect(points_in, proxy = TRUE))
       points_in <- sf::st_bbox(terra::ext(points_in))
@@ -291,13 +292,13 @@ par_make_grid <-
           as.data.frame() |>
           sf::st_as_sf(),
         terra =
-        terra::rast(
-          terra::ext(points_in),
-          nrows = ncutsy,
-          ncols = ncutsx,
-          crs = terra::crs(points_in)
-        ) |>
-        terra::as.polygons()
+          terra::rast(
+            terra::ext(points_in),
+            nrows = ncutsy,
+            ncols = ncutsx,
+            crs = terra::crs(points_in)
+          ) |>
+            terra::as.polygons()
       )
     # grid select
     # grid_out <- grid_out[points_in, ]
@@ -458,8 +459,10 @@ par_cut_coords <- function(x = NULL, y = NULL, quantiles) {
 #' dgs <- sf::st_as_sf(st_make_grid(dg, n = c(20, 15)))
 #' dgs$CGRIDID <- seq(1, nrow(dgs))
 #'
-#' dg_sample <- sf::st_sample(dg, kappa = 5e-9, mu = 15,
-#' scale = 15000, type = "Thomas")
+#' dg_sample <- sf::st_sample(dg,
+#'   kappa = 5e-9, mu = 15,
+#'   scale = 15000, type = "Thomas"
+#' )
 #' sf::st_crs(dg_sample) <- sf::st_crs(dg)
 #' dg_merged <- par_merge_grid(sf::st_as_sf(dg_sample), dgs, 100)
 #' plot(dg_merged$geometry)
@@ -487,11 +490,10 @@ par_cut_coords <- function(x = NULL, y = NULL, quantiles) {
 #' @export
 par_merge_grid <-
   function(
-    points_in = NULL,
-    grid_in = NULL,
-    grid_min_features = NULL,
-    merge_max = 4L
-  ) {
+      points_in = NULL,
+      grid_in = NULL,
+      grid_min_features = NULL,
+      merge_max = 4L) {
     package_detected <- dep_check(points_in)
     if (package_detected == "terra") {
       points_pc <- dep_switch(points_in)
@@ -539,8 +541,10 @@ par_merge_grid <-
     grid_lt_threshold_idx <- seq(1, nrow(grid_pc))[grid_target]
 
     # 5. filter out the ones that are below the threshold
-    identified <- lapply(grid_selfrook,
-                         function(x) sort(x[x %in% grid_lt_threshold_idx]))
+    identified <- lapply(
+      grid_selfrook,
+      function(x) sort(x[x %in% grid_lt_threshold_idx])
+    )
     # filtering self with the lower number of intersecting points
     identified <- identified[grid_target]
     # 6. remove duplicate neighbor pairs
@@ -580,7 +584,7 @@ par_merge_grid <-
       graph_member_excess_idx <-
         which(
           identified_graph_member %in%
-          names(tab_graph_member[tab_graph_member > merge_max])
+            names(tab_graph_member[tab_graph_member > merge_max])
         )
       # extract the excess groups
       graph_member_excess <- identified_graph_member[graph_member_excess_idx]
@@ -602,15 +606,17 @@ par_merge_grid <-
           )
 
         graph_member_excess_split <-
-          mapply(function(x, y) {
+          mapply(
+            function(x, y) {
               rep(vapply(y, FUN = as.numeric, FUN.VALUE = numeric(1)), length(x))
             }, graph_member_excess_split, names(graph_member_excess_split),
             SIMPLIFY = TRUE
           )
         graph_member_excess_split <- unname(unlist(graph_member_excess_split))
         identified_graph_member2[
-          which(identified_graph_member2 == unique(graph_member_excess)[i])] <-
-            graph_member_excess_split
+          which(identified_graph_member2 == unique(graph_member_excess)[i])
+        ] <-
+          graph_member_excess_split
       }
       identified_graph_member <- identified_graph_member2
     } else {
@@ -631,7 +637,8 @@ par_merge_grid <-
         function(lst, label) {
           rep(label, length(lst))
         },
-        merge_member, merge_member_label, SIMPLIFY = TRUE
+        merge_member, merge_member_label,
+        SIMPLIFY = TRUE
       )
     merge_member_label <- unlist(merge_member_label)
 
@@ -652,13 +659,13 @@ par_merge_grid <-
         as.numeric(sf::st_length(sf::st_cast(par_merge_gridd, "LINESTRING")))
       )
     par_merge_gridd_pptest <-
-      (4 * pi * par_merge_gridd_area) / (par_merge_gridd_perimeter ^ 2)
+      (4 * pi * par_merge_gridd_area) / (par_merge_gridd_perimeter^2)
 
     # pptest value is bounded [0,1];
     # 0.3 threshold is groundless at this moment,
     # possibly will make it defined by users.
     if (max(unique(identified_graph_member)) > floor(0.1 * nrow(grid_in)) ||
-          any(par_merge_gridd_pptest < 0.3)) {
+      any(par_merge_gridd_pptest < 0.3)) {
       message("The reduced computational regions have too complex shapes.
       Consider increasing thresholds or using the original grids.\n")
     }
@@ -687,7 +694,8 @@ par_merge_grid <-
 #' library(anticlust)
 #' data(ncpoints, package = "chopin")
 #' ncp <- terra::vect(
-#'   ncpoints, geom = c("X", "Y"),
+#'   ncpoints,
+#'   geom = c("X", "Y"),
 #'   keepgeom = FALSE, crs = "EPSG:5070"
 #' )
 #' # 2,304 points / 12 = 192 points per cluster
@@ -700,9 +708,8 @@ par_merge_grid <-
 #' @importFrom stats dist
 #' @export
 par_group_balanced <- function(
-  points_in = NULL,
-  n_clusters = NULL
-) {
+    points_in = NULL,
+    n_clusters = NULL) {
   if (!is.numeric(n_clusters)) {
     stop("n_clusters should be numeric.\n")
   }

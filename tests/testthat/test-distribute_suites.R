@@ -1,4 +1,3 @@
-
 testthat::test_that("Processes are properly spawned and compute", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -12,7 +11,8 @@ testthat::test_that("Processes are properly spawned and compute", {
     terra::project("EPSG:5070")
   ncpnts <-
     readRDS(
-            system.file("extdata/nc_random_point.rds", package = "chopin"))
+      system.file("extdata/nc_random_point.rds", package = "chopin")
+    )
   ncpnts <- terra::vect(ncpnts)
   ncpnts <- terra::project(ncpnts, "EPSG:5070")
   ncelevpath <- system.file("extdata/nc_srtm15_otm.rds", package = "chopin")
@@ -65,7 +65,7 @@ testthat::test_that("Processes are properly spawned and compute", {
   # check: sf <-> terra conversion changes coordinate precision?
   # this result omits 2 points which are exactly on the boundary.
   testthat::expect_no_error({
-    #plan(multicore, workers = 4L)
+    # plan(multicore, workers = 4L)
     resstr <-
       suppressWarnings(
         par_grid(
@@ -82,9 +82,8 @@ testthat::test_that("Processes are properly spawned and compute", {
           padding = 3e4L
         )
       )
-    #plan(sequential)
-  }
-  )
+    # plan(sequential)
+  })
 
   ncpntsf <- sf::st_as_sf(ncpnts)
   testthat::expect_no_error(
@@ -219,7 +218,8 @@ testthat::test_that("Processes are properly spawned and compute", {
 
 
 testthat::test_that(
-  "Processes are properly spawned and compute over hierarchy", {
+  "Processes are properly spawned and compute over hierarchy",
+  {
     withr::local_package("terra")
     withr::local_package("sf")
     withr::local_package("future")
@@ -434,7 +434,6 @@ testthat::test_that("generic function should be parallelized properly", {
   )
   testthat::expect_s3_class(res_nodebug, "data.frame")
   testthat::expect_equal(nrow(res_nodebug), nrow(pnts))
-
 })
 
 
@@ -539,6 +538,5 @@ testthat::test_that(
       )
     )
     testthat::expect_s3_class(nut, "data.frame")
-
   }
 )

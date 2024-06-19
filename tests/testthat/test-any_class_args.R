@@ -1,12 +1,13 @@
-
 testthat::test_that("classes are detected.", {
   withr::local_package("terra")
   random_df <- data.frame(x = runif(10), y = runif(10))
   random_tv <- terra::vect(random_df, geom = c("x", "y"))
-  test_args <- list(vector = random_tv,
-                    func = mean,
-                    pipi = pi,
-                    zodiac = "Horse")
+  test_args <- list(
+    vector = random_tv,
+    func = mean,
+    pipi = pi,
+    zodiac = "Horse"
+  )
   set_detected <- any_class_args(test_args, "SpatVector")
   # test partial match
   set_detectedp <- any_class_args(test_args, "Spat")
@@ -28,5 +29,4 @@ testthat::test_that("classes are detected.", {
 
   testthat::expect_true(is.logical(bear))
   testthat::expect_true(bear[[1]] == TRUE)
-
 })

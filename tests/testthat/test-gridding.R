@@ -1,4 +1,3 @@
-
 testthat::test_that("Balanced group tests", {
   withr::local_package("sf")
   withr::local_package("terra")
@@ -49,7 +48,6 @@ testthat::test_that("Balanced group tests", {
   testthat::expect_error(
     par_group_grid(rv, 5L, NA)
   )
-
 })
 
 
@@ -108,7 +106,6 @@ testthat::test_that("Quantile cut tests", {
       par_cut_coords(nc, NULL, par_def_q(3L))
     )
   )
-
 })
 
 
@@ -168,7 +165,6 @@ testthat::test_that("Grid split is well done.", {
       quantiles = par_def_q(5L)
     )
   )
-
 })
 
 ## grid merge ####
@@ -190,9 +186,10 @@ testthat::test_that("Grid merge is well done.", {
 
   gridded <-
     par_make_gridset(ncrp,
-                     mode = "grid",
-                     nx = 8L, ny = 5L,
-                     padding = 1e4L)
+      mode = "grid",
+      nx = 8L, ny = 5L,
+      padding = 1e4L
+    )
   testthat::expect_message(par_merge_grid(ncrp, gridded$original, 10L))
   testthat::expect_message(par_merge_grid(ncrp, gridded$original, 2L))
   ncrp2 <- sf::st_as_sf(sf::st_sample(nc, 10000L))
@@ -201,9 +198,10 @@ testthat::test_that("Grid merge is well done.", {
   ncptr <- terra::vect(ncrp)
   griddedtr <-
     par_make_gridset(ncptr,
-                     mode = "grid",
-                     nx = 8L, ny = 5L,
-                     padding = 1e4L)
+      mode = "grid",
+      nx = 8L, ny = 5L,
+      padding = 1e4L
+    )
   testthat::expect_message(
     par_merge_grid(ncptr, griddedtr$original, 10L)
   )
@@ -214,9 +212,10 @@ testthat::test_that("Grid merge is well done.", {
   ncptr2 <- terra::vect(ncpoints, geom = c("X", "Y"), keepgeom = TRUE)
   griddedtr2 <-
     par_make_gridset(ncptr2,
-                     mode = "grid",
-                     nx = 20L, ny = 12L,
-                     padding = 1e4L)
+      mode = "grid",
+      nx = 20L, ny = 12L,
+      padding = 1e4L
+    )
   testthat::expect_no_error(
     gridmerged2 <- par_merge_grid(ncptr2, griddedtr2$original, 15L)
   )
@@ -224,9 +223,10 @@ testthat::test_that("Grid merge is well done.", {
 
   griddedtr22 <-
     par_make_gridset(ncptr2,
-                     mode = "grid",
-                     nx = 40L, ny = 20L,
-                     padding = 1e4L)
+      mode = "grid",
+      nx = 40L, ny = 20L,
+      padding = 1e4L
+    )
   testthat::expect_message(
     gridmergedx <-
       par_merge_grid(
@@ -247,7 +247,6 @@ testthat::test_that("Grid merge is well done.", {
       )
   )
   testthat::expect_s4_class(gridmergedx5, "SpatVector")
-
 })
 
 ## par_group_balanced tests ####
@@ -280,7 +279,6 @@ testthat::test_that("par_group_balanced returns the correct output", {
   testthat::expect_error(
     par_group_balanced(nc_rp, n_clusters = 1L)
   )
-
 })
 
 
@@ -329,11 +327,11 @@ testthat::test_that("par_group_grid returns the correct output", {
   testthat::expect_error(
     testthat::expect_warning(
       gridset2 <-
-      par_group_grid(
-        points_in = nc_rp,
-        ngroups = 10,
-        padding = "eintausend"
-      )
+        par_group_grid(
+          points_in = nc_rp,
+          ngroups = 10,
+          padding = "eintausend"
+        )
     )
   )
   testthat::expect_error(
@@ -360,5 +358,4 @@ testthat::test_that("par_group_grid returns the correct output", {
       ngroups = 10L
     )
   )
-
 })

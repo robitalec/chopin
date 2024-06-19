@@ -1,4 +1,3 @@
-
 testthat::test_that(
   "par_fallback works",
   {

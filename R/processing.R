@@ -21,10 +21,9 @@
 #' @export
 kernelfunction <-
   function(
-    d,
-    bw,
-    kernel = c("uniform", "quartic", "triweight", "epanechnikov")
-  ) {
+      d,
+      bw,
+      kernel = c("uniform", "quartic", "triweight", "epanechnikov")) {
     kernel <- match.arg(kernel)
     if (kernel == "uniform") {
       d <- ifelse(d > bw, 0, 0.5)
@@ -34,10 +33,9 @@ kernelfunction <-
     switch(kernel,
       uniform = d,
       quartic = (15 / 16) * (1 - ((d / bw)^2))^2,
-      triweight = 1 - ((d / bw) ^ 3),
+      triweight = 1 - ((d / bw)^3),
       epanechnikov = (3 / 4) * (1 - ((d / bw)^2))
     )
-
   }
 
 #' Clip to the buffered extent of input vector
@@ -66,10 +64,9 @@ kernelfunction <-
 #' @importFrom terra intersect
 #' @export
 clip_vec_ext <- function(
-  pnts,
-  radius,
-  target_input
-) {
+    pnts,
+    radius,
+    target_input) {
   if (any(
     vapply(
       list(pnts, radius, target_input),
@@ -128,15 +125,15 @@ clip_vec_ext <- function(
 #' @importFrom terra crop
 #' @export
 clip_ras_ext <- function(
-  pnts = NULL,
-  radius = NULL,
-  ras = NULL,
-  nqsegs = 180L
-) {
+    pnts = NULL,
+    radius = NULL,
+    ras = NULL,
+    nqsegs = 180L) {
   if (any(
     vapply(list(pnts, radius, ras),
-           FUN = is.null,
-           FUN.VALUE = logical(1))
+      FUN = is.null,
+      FUN.VALUE = logical(1)
+    )
   )) {
     stop("Any of required arguments are NULL. Please check.\n")
   }
@@ -204,19 +201,17 @@ clip_ras_ext <- function(
 #' @importFrom dplyr ungroup
 #' @export
 extract_at_buffer <- function(
-  points = NULL,
-  surf = NULL,
-  radius = NULL,
-  id = NULL,
-  qsegs = 90L,
-  func = "mean",
-  kernel = NULL,
-  bandwidth = NULL,
-  extent = NULL,
-  max_cells = 2e7,
-  ...
-) {
-
+    points = NULL,
+    surf = NULL,
+    radius = NULL,
+    id = NULL,
+    qsegs = 90L,
+    func = "mean",
+    kernel = NULL,
+    bandwidth = NULL,
+    extent = NULL,
+    max_cells = 2e7,
+    ...) {
   if (!methods::is(surf, "SpatRaster")) {
     surf <- try(terra::rast(surf))
     if (inherits(surf, "try-error")) {
@@ -258,24 +253,22 @@ extract_at_buffer <- function(
       max_cells = max_cells
     )
   return(extracted)
-
 }
 
 # Subfunction: extract at buffers with uniform weights
 #' @rdname extract_at_buffer
 #' @export
 extract_at_buffer_flat <- function(
-  points = NULL,
-  surf = NULL,
-  radius = NULL,
-  id = NULL,
-  qsegs = NULL,
-  func = "mean",
-  kernel = NULL,
-  bandwidth = NULL,
-  max_cells = 2e7,
-  ...
-) {
+    points = NULL,
+    surf = NULL,
+    radius = NULL,
+    id = NULL,
+    qsegs = NULL,
+    func = "mean",
+    kernel = NULL,
+    bandwidth = NULL,
+    max_cells = 2e7,
+    ...) {
   # generate buffers
   bufs <- terra::buffer(points, width = radius, quadsegs = qsegs)
   bufs <- reproject_b2r(bufs, surf)
@@ -307,17 +300,16 @@ extract_at_buffer_flat <- function(
 #' @rdname extract_at_buffer
 #' @export
 extract_at_buffer_kernel <- function(
-  points = NULL,
-  surf = NULL,
-  radius = NULL,
-  id = NULL,
-  qsegs = NULL,
-  func = stats::weighted.mean,
-  kernel = NULL,
-  bandwidth = NULL,
-  max_cells = 2e7,
-  ...
-) {
+    points = NULL,
+    surf = NULL,
+    radius = NULL,
+    id = NULL,
+    qsegs = NULL,
+    func = stats::weighted.mean,
+    kernel = NULL,
+    bandwidth = NULL,
+    max_cells = 2e7,
+    ...) {
   # generate buffers
   bufs <- terra::buffer(points, width = radius, quadsegs = qsegs)
   bufs <- reproject_b2r(bufs, surf)
@@ -332,7 +324,8 @@ extract_at_buffer_kernel <- function(
 
   name_surf_val <-
     ifelse(terra::nlyr(surf_cropped) == 1,
-           "value", names(surf_cropped))
+      "value", names(surf_cropped)
+    )
   # convert to data.frame
   coords_df <- as.data.frame(points, geom = "XY")
   # apply strict order
@@ -380,7 +373,7 @@ extract_at_buffer_kernel <- function(
     ) |>
     dplyr::group_by(!!rlang::sym(id)) |>
     dplyr::summarize(
-      dplyr::across(dplyr::all_of(name_surf_val), ~func(., w = w_kernelarea))
+      dplyr::across(dplyr::all_of(name_surf_val), ~ func(., w = w_kernelarea))
     ) |>
     dplyr::ungroup()
   # restore the original identifier
@@ -439,15 +432,13 @@ extract_at_buffer_kernel <- function(
 #' @importFrom exactextractr exact_extract
 #' @export
 extract_at_poly <- function(
-  polys = NULL,
-  surf = NULL,
-  id = NULL,
-  func = "mean",
-  extent = NULL,
-  max_cells = 2e7,
-  ...
-) {
-
+    polys = NULL,
+    surf = NULL,
+    id = NULL,
+    func = "mean",
+    extent = NULL,
+    max_cells = 2e7,
+    ...) {
   if (!methods::is(surf, "SpatRaster")) {
     surf <- try(terra::rast(surf))
     if (inherits(surf, "try-error")) {
@@ -500,35 +491,33 @@ extract_at_poly <- function(
 #' ## See ?extract_at_poly and ?extract_at_buffer
 #' @export
 extract_at <- function(
-  vector = NULL,
-  raster = NULL,
-  id = NULL,
-  func = "mean",
-  mode = c("polygon", "buffer"),
-  ...
-) {
-
+    vector = NULL,
+    raster = NULL,
+    id = NULL,
+    func = "mean",
+    mode = c("polygon", "buffer"),
+    ...) {
   mode <- match.arg(mode)
   stopifnot(is.character(id))
 
   extracted <-
     switch(mode,
       polygon =
-      extract_at_poly(
-        polys = vector,
-        surf = raster,
-        id = id,
-        func = func,
-        ...
-      ),
+        extract_at_poly(
+          polys = vector,
+          surf = raster,
+          id = id,
+          func = func,
+          ...
+        ),
       buffer =
-      extract_at_buffer(
-        points = vector,
-        surf = raster,
-        id = id,
-        func = func,
-        ...
-      )
+        extract_at_buffer(
+          points = vector,
+          surf = raster,
+          id = id,
+          func = func,
+          ...
+        )
     )
   return(extracted)
 }
@@ -554,13 +543,13 @@ extract_at <- function(
 #' @export
 reproject_b2r <-
   function(
-    vector = NULL,
-    raster = NULL
-  ) {
+      vector = NULL,
+      raster = NULL) {
     detected_vec <- dep_check(vector)
     switch(detected_vec,
-           sf = sf::st_transform(vector, terra::crs(raster)),
-           terra = terra::project(vector, terra::crs(raster)))
+      sf = sf::st_transform(vector, terra::crs(raster)),
+      terra = terra::project(vector, terra::crs(raster))
+    )
   }
 
 
@@ -637,17 +626,15 @@ reproject_b2r <-
 #' @export
 summarize_sedc <-
   function(
-    point_from = NULL,
-    point_to = NULL,
-    id = NULL,
-    sedc_bandwidth = NULL,
-    threshold = NULL,
-    target_fields = NULL,
-    extent_from = NULL,
-    extent_to = NULL,
-    ...
-  ) {
-
+      point_from = NULL,
+      point_to = NULL,
+      id = NULL,
+      sedc_bandwidth = NULL,
+      threshold = NULL,
+      target_fields = NULL,
+      extent_from = NULL,
+      extent_to = NULL,
+      ...) {
     point_from <-
       check_subject(point_from, extent = extent_from, subject_id = id)
     point_to <-
@@ -719,7 +706,7 @@ The result may not be accurate.\n",
       dplyr::summarize(
         dplyr::across(
           dplyr::all_of(target_fields),
-          list(sedc = ~sum(w_sedc * ., na.rm = TRUE))
+          list(sedc = ~ sum(w_sedc * ., na.rm = TRUE))
         )
       ) |>
       dplyr::ungroup()
@@ -756,13 +743,13 @@ The result may not be accurate.\n",
 #' # package
 #' library(sf)
 #' sf_use_s2(FALSE)
-#' nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
+#' nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"))
 #' nc <- sf::st_transform(nc, 5070)
 #' pp <- sf::st_sample(nc, size = 300)
 #' pp <- sf::st_as_sf(pp)
 #' pp[["id"]] <- seq(1, nrow(pp))
 #' sf::st_crs(pp) <- "EPSG:5070"
-#' ppb <- sf::st_buffer(pp, nQuadSegs=180, dist = units::set_units(20, "km"))
+#' ppb <- sf::st_buffer(pp, nQuadSegs = 180, dist = units::set_units(20, "km"))
 #'
 #' system.time(ppb_nc_aw <- summarize_aw(ppb, nc, c("BIR74", "BIR79"), "id"))
 #' summary(ppb_nc_aw)
@@ -780,24 +767,20 @@ The result may not be accurate.\n",
 #' @export
 summarize_aw <-
   function(
-    poly_in = NULL,
-    poly_weight = NULL,
-    target_fields = NULL,
-    id_poly_in = "ID",
-    fun = stats::weighted.mean,
-    extent = NULL
-  ) {
-
+      poly_in = NULL,
+      poly_weight = NULL,
+      target_fields = NULL,
+      id_poly_in = "ID",
+      fun = stats::weighted.mean,
+      extent = NULL) {
     poly_in <- check_subject(poly_in, extent = extent, subject_id = id_poly_in)
     poly_weight <- check_subject(poly_weight, extent = extent)
 
     summarize_aw_terra <-
-      function(
-        poly_in = NULL,
-        poly_weight = NULL,
-        target_fields = NULL,
-        id_poly_in = id_poly_in
-      ) {
+      function(poly_in = NULL,
+               poly_weight = NULL,
+               target_fields = NULL,
+               id_poly_in = id_poly_in) {
         poly_intersected <- terra::intersect(poly_in, poly_weight)
         poly_intersected[["area_segment_"]] <-
           terra::expanse(poly_intersected)
@@ -806,7 +789,7 @@ summarize_aw <-
           dplyr::summarize(
             dplyr::across(
               dplyr::all_of(target_fields),
-              ~fun(., w = area_segment_)
+              ~ fun(., w = area_segment_)
             )
           ) |>
           dplyr::ungroup()
@@ -825,7 +808,8 @@ summarize_aw <-
         suppressWarnings(
           sf::st_interpolate_aw(
             poly_weight[, target_fields],
-            poly_in, extensive = FALSE
+            poly_in,
+            extensive = FALSE
           )
         ),
       terra =
@@ -835,5 +819,4 @@ summarize_aw <-
           id_poly_in = id_poly_in
         )
     )
-
   }

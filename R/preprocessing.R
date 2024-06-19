@@ -73,9 +73,8 @@ dep_switch <- function(input) {
 #' @importFrom sf st_as_sfc
 #' @export
 get_clip_ext <- function(
-  pnts,
-  radius
-) {
+    pnts,
+    radius) {
   detected <- dep_check(pnts)
   if (detected == "terra") {
     ext_input <- terra::ext(pnts)

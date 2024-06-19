@@ -18,7 +18,7 @@
 #' @export
 dep_check <- function(input) {
   if (!any(class(input) %in%
-  c("sf", "stars", "SpatVector", "SpatRaster", "SpatVectorProxy"))
+    c("sf", "stars", "SpatVector", "SpatRaster", "SpatVectorProxy"))
   ) {
     stop("Input should be one of sf or Spat* object.\n")
   }
@@ -104,31 +104,26 @@ datamod <- function(input) {
 #' @export
 reproject_std <-
   function(
-    input,
-    crs_standard = "EPSG:4326"
-  ) {
-
+      input,
+      crs_standard = "EPSG:4326") {
     bound_package <- dep_check(input)
-    input_crs <- switch(
-      bound_package,
+    input_crs <- switch(bound_package,
       sf = sf::st_crs(input)$epsg,
       terra = terra::crs(input, describe = TRUE)$code
     )
-    standard_crs <- switch(
-      bound_package,
+    standard_crs <- switch(bound_package,
       sf = sf::st_crs(crs_standard)$epsg,
       terra = terra::crs(crs_standard, describe = TRUE)$code
     )
     if (input_crs == standard_crs) {
       return(input)
     }
-    input_transformed <- switch(
-      bound_package,
+    input_transformed <- switch(bound_package,
       sf = sf::st_transform(input, sf::st_crs(crs_standard)),
       terra = terra::project(x = input, y = crs_standard)
     )
     return(input_transformed)
-}
+  }
 
 #' Validate and repair input vector data
 #' @family Helper functions
@@ -202,27 +197,23 @@ ext2poly <- function(
       stop("Your extent is an unnamed numeric vector.
 Please define names xmin/xmax/ymin/ymax explicitly.\n")
     }
-    extent <- switch(
-      output_class,
+    extent <- switch(output_class,
       sf = sf::st_bbox(extent),
       terra = terra::ext(extent)
     )
   }
 
-  extent_polygon <- switch(
-    output_class,
+  extent_polygon <- switch(output_class,
     sf = sf::st_as_sf(sf::st_as_sfc(extent)),
     terra = terra::vect(extent)
   )
 
-  extent_polygon <- switch(
-    output_class,
+  extent_polygon <- switch(output_class,
     sf = sf::st_set_crs(extent_polygon, sf::st_crs(crs)),
     terra = terra::set.crs(extent_polygon, terra::crs(crs))
   )
 
   return(extent_polygon)
-
 }
 
 
@@ -257,15 +248,15 @@ Please define names xmin/xmax/ymin/ymax explicitly.\n")
 #' @importFrom sf st_within
 #' @export
 is_bbox_within_reference <- function(
-  data_query = NULL,
-  reference = NULL
-) {
+    data_query = NULL,
+    reference = NULL) {
   reference <- sf::st_as_sfc(sf::st_bbox(reference))
   print(sf::st_crs(reference))
 
   data_query_bb <-
     sf::st_as_sfc(sf::st_bbox(data_query),
-                  crs = sf::st_crs(data_query))
+      crs = sf::st_crs(data_query)
+    )
   print(sf::st_crs(data_query_bb))
   query_matched <- sf::st_transform(data_query_bb, sf::st_crs(reference))
   check_result <- as.logical(unlist(sf::st_within(query_matched, reference)))
@@ -283,16 +274,18 @@ is_bbox_within_reference <- function(
 #' @examples
 #' # data
 #' library(sf)
-#' ncpath = system.file("shape/nc.shp", package = "sf")
-#' nc = read_sf(ncpath)
+#' ncpath <- system.file("shape/nc.shp", package = "sf")
+#' nc <- read_sf(ncpath)
 #' crs_check(nc)
 #' @importFrom sf st_crs
 #' @importFrom terra crs
 #' @importFrom methods is
 #' @export
 crs_check <- function(x = NULL) {
-  ref_class <- c("sf", "stars", "SpatVector",
-                 "SpatRaster", "SpatRasterDataset")
+  ref_class <- c(
+    "sf", "stars", "SpatVector",
+    "SpatRaster", "SpatRasterDataset"
+  )
 
   if (!any(ref_class %in% class(x))) {
     stop("Input is invalid.\n")
@@ -390,9 +383,8 @@ is_within_ref <- function(input_object, reference) {
 #' any_class_args(list(df), "data.frame")
 #' @export
 any_class_args <- function(
-  args = NULL,
-  search = NULL
-) {
+    args = NULL,
+    search = NULL) {
   searchphrase <- sprintf("(%s)", search)
   args_scanned <- lapply(args, function(x) any(grepl(searchphrase, class(x))))
   args_scanned <- vapply(args_scanned, FUN = any, FUN.VALUE = logical(1))
@@ -421,10 +413,9 @@ any_class_args <- function(
 #' check_subject(subject = ncpath, extent = extent, subject_id = "FIPS")
 #' @export
 check_subject <- function(
-  subject,
-  extent = NULL,
-  subject_id = NULL
-) {
+    subject,
+    extent = NULL,
+    subject_id = NULL) {
   # type check
   if (!any(
     vapply(
